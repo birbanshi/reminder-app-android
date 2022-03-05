@@ -11,41 +11,108 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  Icon icon = const Icon(Icons.search);
+  Widget customWidget = const Text("To Do");
+  final TextEditingController searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: const Center(
-        child: Text("Welcome Home"),
-      ),
-      appBar: AppBar(
-        title: const Text("To Do"),
-        actions: [
-          IconButton(
-            onPressed: () async {
-              String? retVal = await Auth(auth: _auth).signOut();
-              if (retVal == "Success") {
-                Navigator.pushNamedAndRemoveUntil(
-                    context, "/login", (route) => false);
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Error occured!"),
-                  ),
-                );
-              }
-            },
-            icon: const Icon(Icons.logout),
+    return GestureDetector(
+      onTap: () {
+        FocusScopeNode _currentFocus = FocusScope.of(context);
+        if (!_currentFocus.hasPrimaryFocus) {
+          _currentFocus.unfocus();
+        }
+      },
+      child: Scaffold(
+        key: _scaffoldKey,
+        body: const Center(
+          child: Text("Welcome Home"),
+        ),
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: customWidget,
+          actions: [
+            IconButton(
+              onPressed: () async {
+                String? retVal = await Auth(auth: _auth).signOut();
+                if (retVal == "Success") {
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, "/login", (route) => false);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Error occured!"),
+                    ),
+                  );
+                }
+              },
+              icon: const Icon(Icons.logout),
+            ),
+          ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.pushNamed(context, "/addToDo");
+          },
+          child: const Icon(Icons.add),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        bottomNavigationBar: BottomAppBar(
+          child: Row(
+            children: [
+              IconButton(
+                onPressed: () {
+                  _scaffoldKey.currentState?.openDrawer();
+                },
+                icon: const Icon(Icons.menu),
+              ),
+              const Spacer(),
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    if (icon.icon == Icons.search) {
+                      icon = const Icon(Icons.cancel);
+                      customWidget = ListTile(
+                        leading: const Icon(
+                          Icons.search,
+                          color: Colors.white,
+                        ),
+                        title: TextField(
+                          controller: searchController,
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            hintText: "Search..",
+                            hintStyle: TextStyle(color: Colors.white),
+                          ),
+                          style: const TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                        trailing: IconButton(
+                          onPressed: () {
+                            searchController.clear();
+                          },
+                          icon: const Icon(
+                            Icons.clear_all,
+                            color: Colors.white,
+                          ),
+                        ),
+                      );
+                    } else {
+                      icon = const Icon(Icons.search);
+                      customWidget = const Text("To Do");
+                    }
+                  });
+                },
+                icon: icon,
+              ),
+            ],
           ),
-        ],
+        ),
+        drawer: const Drawer(),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pushNamed(context, "/addToDo");
-        },
-        child: const Icon(Icons.add),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }

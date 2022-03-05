@@ -11,6 +11,8 @@ class AddToDo extends StatefulWidget {
 class _AddToDoState extends State<AddToDo> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  bool isPinned = false;
+  bool notifyToggle = false;
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +28,24 @@ class _AddToDoState extends State<AddToDo> {
           title: const Text("Add ToDo"),
           actions: [
             IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.push_pin_outlined),
+              onPressed: () {
+                setState(() {
+                  isPinned = !isPinned;
+                });
+              },
+              icon: isPinned
+                  ? const Icon(Icons.push_pin_rounded)
+                  : const Icon(Icons.push_pin_outlined),
+            ),
+            IconButton(
+              onPressed: () {
+                setState(() {
+                  notifyToggle = !notifyToggle;
+                });
+              },
+              icon: notifyToggle
+                  ? const Icon(Icons.notification_add_rounded)
+                  : const Icon(Icons.notification_add_outlined),
             ),
           ],
         ),
@@ -52,10 +70,15 @@ class _AddToDoState extends State<AddToDo> {
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             FocusScope.of(context).unfocus();
-            showDialog(
-              context: context,
-              builder: (_) => const PopUp(),
-            );
+            if (notifyToggle) {
+              showDialog(
+                context: context,
+                builder: (_) => const PopUp(),
+              );
+            } else {
+              Navigator.pushNamedAndRemoveUntil(
+                  context, "/home", (route) => false);
+            }
           },
           child: const Icon(Icons.check),
         ),

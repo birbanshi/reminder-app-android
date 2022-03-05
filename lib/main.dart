@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:to_do_app/routes/app_routes.dart';
 import 'package:to_do_app/screens/add_todo.dart';
 import 'package:to_do_app/screens/home_screen.dart';
@@ -6,8 +7,10 @@ import 'package:to_do_app/screens/landing_screen.dart';
 import 'package:to_do_app/screens/login.dart';
 import 'package:to_do_app/screens/sign_up.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+  // await Hive.openBox<ToDo>("data");
   runApp(const MyApp());
 }
 
