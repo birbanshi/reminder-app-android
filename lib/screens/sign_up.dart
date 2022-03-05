@@ -56,8 +56,8 @@ class _SignUpState extends State<SignUp> {
                   ElevatedButton(
                     onPressed: () async {
                       String? retVal = await Auth(auth: _auth).createAccount(
-                          email: _emailController.text,
-                          password: _passwordController.text);
+                          email: _emailController.text.trim()
+                          password: _passwordController.text.trim());
                       if (retVal == "Success") {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(

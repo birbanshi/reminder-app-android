@@ -51,8 +51,8 @@ class _LogInState extends State<LogIn> {
                   ElevatedButton(
                     onPressed: () async {
                       final String? retVal = await Auth(auth: _auth).signIn(
-                          email: _emailController.text,
-                          password: _passwordController.text);
+                          email: _emailController.text.trim(),
+                          password: _passwordController.text.trim());
                       if (retVal == "Success") {
                         Navigator.pushNamedAndRemoveUntil(
                             context, "/home", (route) => false);

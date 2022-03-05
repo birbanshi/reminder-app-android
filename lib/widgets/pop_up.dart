@@ -1,8 +1,55 @@
-import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
-class PopUp extends StatelessWidget {
+extension TimeOfDayExtension on TimeOfDay {
+  TimeOfDay add({int hour = 0, int minute = 0}) {
+    return replacing(hour: this.hour + hour, minute: this.minute + minute);
+  }
+}
+
+class PopUp extends StatefulWidget {
   const PopUp({Key? key}) : super(key: key);
+
+  @override
+  State<PopUp> createState() => _PopUpState();
+}
+
+class _PopUpState extends State<PopUp> {
+  TimeOfDay time = TimeOfDay.now().add(hour: 1);
+  DateTime date = DateTime.now();
+  bool changeDateText = false;
+  bool changeTimeText = false;
+
+  void showCustomTimePickerDialog() async {
+    final TimeOfDay? dialog = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now().add(hour: 1),
+      initialEntryMode: TimePickerEntryMode.dial,
+      helpText: "When to remind?",
+    );
+    if (dialog != null) {
+      setState(() {
+        changeTimeText = true;
+        time = dialog;
+      });
+    }
+  }
+
+  void showCustomDatePickerDialog() async {
+    final DateTime? dialog = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2030),
+      helpText: "When to remind?",
+    );
+    if (dialog != null) {
+      setState(() {
+        date = dialog;
+        changeDateText = true;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -12,21 +59,24 @@ class PopUp extends StatelessWidget {
         children: [
           Column(
             children: [
-              DateTimePicker(
-                type: DateTimePickerType.date,
-                firstDate: DateTime.now(),
-                lastDate: DateTime(2030),
-                icon: const Icon(Icons.event),
-                dateHintText: "Today",
+              InkWell(
+                child: ListTile(
+                  title: !changeDateText
+                      ? const Text("Today")
+                      : Text(DateFormat("yyyy-MM-dd").format(date)),
+                  trailing: const Icon(Icons.date_range),
+                ),
+                onTap: showCustomDatePickerDialog,
               ),
-              DateTimePicker(
-                type: DateTimePickerType.time,
-                timeHintText: "After 5 Mins.",
-                initialTime: TimeOfDay.now(),
-                icon: const Icon(Icons.alarm),
-                // use24HourFormat: false,
-                // locale: const Locale('en'),
-              )
+              InkWell(
+                child: ListTile(
+                  title: !changeTimeText
+                      ? const Text("After 1 hour")
+                      : Text(time.format(context)),
+                  trailing: const Icon(Icons.access_time),
+                ),
+                onTap: showCustomTimePickerDialog,
+              ),
             ],
           ),
         ],

@@ -29,7 +29,6 @@ environment:
 dependencies:
   cloud_firestore: ^3.1.10
   cupertino_icons: ^1.0.2
-  date_time_picker: ^2.1.0
   firebase_auth: ^3.3.9
   firebase_core: ^1.13.1
   flutter:
@@ -46,6 +45,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   hive_generator: ^1.1.2
+  intl: ^0.17.0
   mockito: ^5.1.0
 
 # For information on the generic Dart part of this file, see the
