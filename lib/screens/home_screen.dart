@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:to_do_app/models/data.dart';
 import 'package:to_do_app/services/auth.dart';
+import 'package:to_do_app/widgets/home_body.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -27,9 +29,9 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       child: Scaffold(
         key: _scaffoldKey,
-        body: const Center(
-          child: Text("Welcome Home"),
-        ),
+        body: DataHandler().getToDos().isEmpty
+            ? const Center(child: Text("Nothing to show"))
+            : const HomeBody(),
         appBar: AppBar(
           automaticallyImplyLeading: false,
           title: customWidget,

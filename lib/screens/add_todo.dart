@@ -11,8 +11,21 @@ class AddToDo extends StatefulWidget {
 class _AddToDoState extends State<AddToDo> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  bool showErrorText = false;
+  // bool validate = false;
   bool isPinned = false;
   bool notifyToggle = false;
+
+  List<MyButton> buttonList = <MyButton>[
+    MyButton(index: 0, color: Colors.white),
+    MyButton(index: 1, color: Colors.amber),
+    MyButton(index: 2, color: Colors.indigo),
+    MyButton(index: 3, color: Colors.purple),
+    MyButton(index: 4, color: Colors.pink),
+    MyButton(index: 5, color: Colors.teal),
+  ];
+  int index = 0;
+  Color backgroundColor = Colors.white;
 
   @override
   Widget build(BuildContext context) {
@@ -49,32 +62,50 @@ class _AddToDoState extends State<AddToDo> {
             ),
           ],
         ),
-        body: Column(
-          children: [
-            TextField(
-              controller: _titleController,
-              decoration: const InputDecoration(
-                border: InputBorder.none,
-                hintText: "ToDo",
+        body: Container(
+          // color: backgroundColor,
+          child: Column(
+            children: [
+              TextField(
+                controller: _titleController,
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  hintText: "ToDo",
+                  errorText: showErrorText ? "Field can't be empty" : null,
+                ),
               ),
-            ),
-            TextField(
-              controller: _descriptionController,
-              decoration: const InputDecoration(
-                  border: InputBorder.none, hintText: "Description"),
-              maxLines: null,
-              keyboardType: TextInputType.multiline,
-            ),
-          ],
+              TextField(
+                controller: _descriptionController,
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  hintText: "Description",
+                ),
+                maxLines: null,
+                keyboardType: TextInputType.multiline,
+              ),
+            ],
+          ),
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             FocusScope.of(context).unfocus();
             if (notifyToggle) {
-              showDialog(
-                context: context,
-                builder: (_) => const PopUp(),
-              );
+              setState(() {
+                _titleController.text.trim().isEmpty
+                    ? showErrorText = true
+                    : showErrorText = false;
+              });
+              if (!showErrorText) {
+                showDialog(
+                  context: context,
+                  builder: (_) => PopUp(
+                    title: _titleController.text.trim(),
+                    description: _descriptionController.text.trim(),
+                    isPinned: isPinned,
+                    color: backgroundColor,
+                  ),
+                );
+              }
             } else {
               Navigator.pushNamedAndRemoveUntil(
                   context, "/home", (route) => false);
@@ -82,8 +113,56 @@ class _AddToDoState extends State<AddToDo> {
           },
           child: const Icon(Icons.check),
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        persistentFooterButtons: [
+          Container(
+              padding: const EdgeInsets.only(
+                top: 32,
+                bottom: 10,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: buttonList
+                    .map(
+                      (MyButton btn) => InkWell(
+                        child: Stack(
+                          children: [
+                            Container(
+                              height: 45,
+                              width: 45,
+                              color: btn.color,
+                            ),
+                            Container(
+                              child: Icon(
+                                Icons.check,
+                                size: 40,
+                                color: (index == btn.index)
+                                    ? Colors.grey[800]
+                                    : btn.color,
+                              ),
+                              alignment: Alignment.center,
+                            )
+                          ],
+                        ),
+                        onTap: () {
+                          setState(() {
+                            index = btn.index;
+                            backgroundColor = btn.color;
+                            // debugPrint(index.toString());
+                          });
+                        },
+                      ),
+                    )
+                    .toList(),
+              ))
+        ],
       ),
     );
   }
+}
+
+class MyButton {
+  final int index;
+  final Color color;
+  MyButton({required this.index, required this.color});
 }
