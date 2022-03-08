@@ -62,53 +62,46 @@ class _AddToDoState extends State<AddToDo> {
             ),
           ],
         ),
-        body: Container(
-          // color: backgroundColor,
-          child: Column(
-            children: [
-              TextField(
-                controller: _titleController,
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  hintText: "ToDo",
-                  errorText: showErrorText ? "Field can't be empty" : null,
-                ),
+        body: Column(
+          children: [
+            TextField(
+              controller: _titleController,
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: "ToDo",
+                errorText: showErrorText ? "Field can't be empty" : null,
               ),
-              TextField(
-                controller: _descriptionController,
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  hintText: "Description",
-                ),
-                maxLines: null,
-                keyboardType: TextInputType.multiline,
+            ),
+            TextField(
+              controller: _descriptionController,
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                hintText: "Description",
               ),
-            ],
-          ),
+              maxLines: null,
+              keyboardType: TextInputType.multiline,
+            ),
+          ],
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             FocusScope.of(context).unfocus();
-            if (notifyToggle) {
-              setState(() {
-                _titleController.text.trim().isEmpty
-                    ? showErrorText = true
-                    : showErrorText = false;
-              });
-              if (!showErrorText) {
-                showDialog(
-                  context: context,
-                  builder: (_) => PopUp(
-                    title: _titleController.text.trim(),
-                    description: _descriptionController.text.trim(),
-                    isPinned: isPinned,
-                    color: backgroundColor,
-                  ),
-                );
-              }
-            } else {
-              Navigator.pushNamedAndRemoveUntil(
-                  context, "/home", (route) => false);
+            setState(() {
+              _titleController.text.trim().isEmpty
+                  ? showErrorText = true
+                  : showErrorText = false;
+            });
+            if (!showErrorText) {
+              showDialog(
+                context: context,
+                builder: (_) => PopUp(
+                  title: _titleController.text.trim(),
+                  description: _descriptionController.text.trim(),
+                  isPinned: isPinned,
+                  color: backgroundColor,
+                  notificationStatus: notifyToggle,
+                ),
+              );
             }
           },
           child: const Icon(Icons.check),
@@ -116,45 +109,46 @@ class _AddToDoState extends State<AddToDo> {
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         persistentFooterButtons: [
           Container(
-              padding: const EdgeInsets.only(
-                top: 32,
-                bottom: 10,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: buttonList
-                    .map(
-                      (MyButton btn) => InkWell(
-                        child: Stack(
-                          children: [
-                            Container(
-                              height: 45,
-                              width: 45,
-                              color: btn.color,
+            padding: const EdgeInsets.only(
+              top: 32,
+              bottom: 10,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: buttonList
+                  .map(
+                    (MyButton btn) => InkWell(
+                      child: Stack(
+                        children: [
+                          Container(
+                            height: 45,
+                            width: 45,
+                            color: btn.color,
+                          ),
+                          Container(
+                            child: Icon(
+                              Icons.check,
+                              size: 40,
+                              color: (index == btn.index)
+                                  ? Colors.grey[800]
+                                  : btn.color,
                             ),
-                            Container(
-                              child: Icon(
-                                Icons.check,
-                                size: 40,
-                                color: (index == btn.index)
-                                    ? Colors.grey[800]
-                                    : btn.color,
-                              ),
-                              alignment: Alignment.center,
-                            )
-                          ],
-                        ),
-                        onTap: () {
-                          setState(() {
-                            index = btn.index;
-                            backgroundColor = btn.color;
-                            // debugPrint(index.toString());
-                          });
-                        },
+                            alignment: Alignment.center,
+                          ),
+                        ],
                       ),
-                    )
-                    .toList(),
-              ))
+                      onTap: () {
+                        setState(() {
+                          index = btn.index;
+                          backgroundColor = btn.color;
+                          // debugPrint(index.toString());
+                        });
+                      },
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
         ],
       ),
     );

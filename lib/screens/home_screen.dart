@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:to_do_app/models/data.dart';
 import 'package:to_do_app/services/auth.dart';
 import 'package:to_do_app/widgets/home_body.dart';
 
@@ -29,9 +28,16 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       child: Scaffold(
         key: _scaffoldKey,
-        body: DataHandler().getToDos().isEmpty
-            ? const Center(child: Text("Nothing to show"))
-            : const HomeBody(),
+        // TODO got work to do here
+        body: Center(
+          child: TextButton(
+            onPressed: () {},
+            child: const Text("Get all data"),
+          ),
+        ),
+        // DataHandler().getToDos().isEmpty
+        //     ? const Center(child: Text("Nothing to show"))
+        //     : const HomeBody(),
         appBar: AppBar(
           automaticallyImplyLeading: false,
           title: customWidget,
@@ -40,6 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () async {
                 String? retVal = await Auth(auth: _auth).signOut();
                 if (retVal == "Success") {
+                  // TODO fix the _castError exception
                   Navigator.pushNamedAndRemoveUntil(
                       context, "/login", (route) => false);
                 } else {

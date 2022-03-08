@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:to_do_app/models/data.dart';
-import 'package:to_do_app/models/to_do.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:to_do_app/utils/helper_methods.dart';
 
 // Extension class that adds a new method add to TimeOfDay
 extension TimeOfDayExtension on TimeOfDay {
@@ -15,12 +15,14 @@ class PopUp extends StatefulWidget {
   final String? description;
   final bool isPinned;
   final Color color;
+  final bool notificationStatus;
   const PopUp(
       {Key? key,
       required this.title,
       this.description,
       required this.isPinned,
-      required this.color})
+      required this.color,
+      required this.notificationStatus})
       : super(key: key);
 
   @override
@@ -28,7 +30,6 @@ class PopUp extends StatefulWidget {
 }
 
 class _PopUpState extends State<PopUp> {
-  DataHandler handler = DataHandler();
   // Default value of time, i.e. time after an hour
   TimeOfDay time = TimeOfDay.now().add(hour: 1);
   // Default value of date, i.e. today
@@ -38,21 +39,65 @@ class _PopUpState extends State<PopUp> {
   // If true this changes time text from "After 1 hour" to the time selected
   bool changeTimeText = false;
 
+  // TODO modify this function to save data to sql database
   // Gets user input
-  void getUserInput(
+  // void getUserInput(
+  //     {required String title,
+  //     required String? description,
+  //     required bool pinned,
+  //     required Color color}) {
+  //   handler.insert(ToDo()
+  //     ..toDoTitle = title
+  //     ..toDoDescription = description
+  //     ..notify = true
+  //     ..date =
+  //         DateFormat("yyyy-MM-dd").parse(DateFormat("yyyy-MM-dd").format(date))
+  //     ..time = time
+  //     ..pinned = pinned
+  //     ..color = color);
+  // }
+
+  // TODO function to insert data in database
+  void insertDataIntoDatabase(
       {required String title,
       required String? description,
       required bool pinned,
-      required Color color}) {
-    handler.insert(ToDo()
-      ..toDoTitle = title
-      ..toDoDescription = description
-      ..notify = true
-      ..date =
-          DateFormat("yyyy-MM-dd").parse(DateFormat("yyyy-MM-dd").format(date))
-      ..time = time
-      ..pinned = pinned
-      ..color = color);
+      required bool notify,
+      required Color color}) async {
+    // Database db = await DatabaseProvider.instance.database;
+    // Map<String, dynamic> entry = {
+    //   DatabaseProvider.titleColumn: title,
+    //   DatabaseProvider.descriptionColumn: description,
+    //   DatabaseProvider.pinnedColumn: pinned,
+    //   DatabaseProvider.notifyColumn: notify,
+    //   DatabaseProvider.color: color.toString(),
+    //   DatabaseProvider.date: date.toString(),
+    //   DatabaseProvider.time: time.toString()
+    // };
+    // DatabaseProvider.instance.insertIntooDatabase(entry);
+    // debugPrint(DatabaseProvider.instance.insertIntooDatabase(entry).toString());
+
+    // TODO try removing the try catch block
+    // try {
+    // debugPrint(await db.insert(DatabaseProvider.instance.tableName, entry)
+    //     as String);
+    // } on DatabaseException catch (e) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     SnackBar(
+    //       content: Text(e.result.toString()),
+    //     ),
+    //   );
+    // } catch (e) {
+    //   // TODO fix the issue
+    //   // ScaffoldMessenger.of(context).showSnackBar(
+    //   //   SnackBar(
+    //   //     content: Text(
+    //   //       e.toString(),
+    //   //     ),
+    //   //   ),
+    //   // );
+    //   rethrow;
+    // }
   }
 
   void showCustomTimePickerDialog() async {
@@ -127,10 +172,11 @@ class _PopUpState extends State<PopUp> {
         ),
         ElevatedButton(
           onPressed: () {
-            getUserInput(
+            insertDataIntoDatabase(
                 title: widget.title,
                 description: widget.description,
                 pinned: widget.isPinned,
+                notify: widget.notificationStatus,
                 color: widget.color);
             Navigator.pushNamedAndRemoveUntil(
                 context, "/home", (route) => false);
