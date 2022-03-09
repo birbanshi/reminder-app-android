@@ -1,6 +1,6 @@
 # to_do_app
 
-A new Flutter project.
+A new Flutter project. Actively in development.
 
 ## Getting Started
 
