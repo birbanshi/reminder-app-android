@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:to_do_app/widgets/pop_up.dart';
+import 'dart:developer' as developer;
 
 class AddToDo extends StatefulWidget {
   const AddToDo({Key? key}) : super(key: key);
@@ -16,6 +17,7 @@ class _AddToDoState extends State<AddToDo> {
   bool isPinned = false;
   bool notifyToggle = false;
 
+  // Button colors
   List<MyButton> buttonList = <MyButton>[
     MyButton(index: 0, color: Colors.white),
     MyButton(index: 1, color: Colors.amber),
@@ -24,6 +26,7 @@ class _AddToDoState extends State<AddToDo> {
     MyButton(index: 4, color: Colors.pink),
     MyButton(index: 5, color: Colors.teal),
   ];
+  // Default index
   int index = 0;
   Color backgroundColor = Colors.white;
 
@@ -43,6 +46,7 @@ class _AddToDoState extends State<AddToDo> {
             IconButton(
               onPressed: () {
                 setState(() {
+                  // Changes button state
                   isPinned = !isPinned;
                 });
               },
@@ -52,6 +56,7 @@ class _AddToDoState extends State<AddToDo> {
             ),
             IconButton(
               onPressed: () {
+                // Changes button state
                 setState(() {
                   notifyToggle = !notifyToggle;
                 });
@@ -92,6 +97,7 @@ class _AddToDoState extends State<AddToDo> {
                   : showErrorText = false;
             });
             if (!showErrorText) {
+              developer.log(_descriptionController.text.trim());
               showDialog(
                 context: context,
                 builder: (_) => PopUp(
@@ -141,7 +147,11 @@ class _AddToDoState extends State<AddToDo> {
                         setState(() {
                           index = btn.index;
                           backgroundColor = btn.color;
-                          // debugPrint(index.toString());
+                          // Log output
+                          developer.log(
+                              "Button ${btn.index + 1} is selected. Color => ${btn.color}",
+                              name: "AddToDo",
+                              level: 500);
                         });
                       },
                     ),

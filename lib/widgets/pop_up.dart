@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:to_do_app/models/database/database_provider.dart';
+import 'package:to_do_app/models/reminder.dart';
 import 'package:to_do_app/utils/helper_methods.dart';
+import 'dart:developer' as developer;
 
 // Extension class that adds a new method add to TimeOfDay
 extension TimeOfDayExtension on TimeOfDay {
-  TimeOfDay add({int hour = 0, int minute = 0}) {
-    return replacing(hour: this.hour + hour, minute: this.minute + minute);
+  TimeOfDay add({int hour = 0}) {
+    final retHour = TimeOfDay.now().hour + hour;
+    if (retHour > 23) {
+      return replacing(hour: 0);
+    }
+    return replacing(hour: retHour);
   }
 }
 
@@ -39,24 +45,6 @@ class _PopUpState extends State<PopUp> {
   // If true this changes time text from "After 1 hour" to the time selected
   bool changeTimeText = false;
 
-  // TODO modify this function to save data to sql database
-  // Gets user input
-  // void getUserInput(
-  //     {required String title,
-  //     required String? description,
-  //     required bool pinned,
-  //     required Color color}) {
-  //   handler.insert(ToDo()
-  //     ..toDoTitle = title
-  //     ..toDoDescription = description
-  //     ..notify = true
-  //     ..date =
-  //         DateFormat("yyyy-MM-dd").parse(DateFormat("yyyy-MM-dd").format(date))
-  //     ..time = time
-  //     ..pinned = pinned
-  //     ..color = color);
-  // }
-
   // TODO function to insert data in database
   void insertDataIntoDatabase(
       {required String title,
@@ -64,40 +52,15 @@ class _PopUpState extends State<PopUp> {
       required bool pinned,
       required bool notify,
       required Color color}) async {
-    // Database db = await DatabaseProvider.instance.database;
-    // Map<String, dynamic> entry = {
-    //   DatabaseProvider.titleColumn: title,
-    //   DatabaseProvider.descriptionColumn: description,
-    //   DatabaseProvider.pinnedColumn: pinned,
-    //   DatabaseProvider.notifyColumn: notify,
-    //   DatabaseProvider.color: color.toString(),
-    //   DatabaseProvider.date: date.toString(),
-    //   DatabaseProvider.time: time.toString()
-    // };
-    // DatabaseProvider.instance.insertIntooDatabase(entry);
-    // debugPrint(DatabaseProvider.instance.insertIntooDatabase(entry).toString());
-
-    // TODO try removing the try catch block
-    // try {
-    // debugPrint(await db.insert(DatabaseProvider.instance.tableName, entry)
-    //     as String);
-    // } on DatabaseException catch (e) {
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     SnackBar(
-    //       content: Text(e.result.toString()),
-    //     ),
-    //   );
-    // } catch (e) {
-    //   // TODO fix the issue
-    //   // ScaffoldMessenger.of(context).showSnackBar(
-    //   //   SnackBar(
-    //   //     content: Text(
-    //   //       e.toString(),
-    //   //     ),
-    //   //   ),
-    //   // );
-    //   rethrow;
-    // }
+    Reminder reminder = Reminder(
+        title: title,
+        isPinned: pinned,
+        notify: notify,
+        date: date,
+        time: time,
+        description: description);
+    developer.log(reminder.toString());
+    DatabaseProvider.instance.createReminder(reminder: reminder);
   }
 
   void showCustomTimePickerDialog() async {
@@ -126,7 +89,8 @@ class _PopUpState extends State<PopUp> {
     );
     if (dialog != null) {
       setState(() {
-        // Changes the date text and sets the date to the value selected by the user
+        // Changes the date text and sets the date
+        // to the value selected by the user
         date = dialog;
         changeDateText = true;
       });
