@@ -59,7 +59,7 @@ class _PopUpState extends State<PopUp> {
         date: date,
         time: time,
         description: description);
-    developer.log(reminder.toString());
+    // developer.log(reminder.toString());
     DatabaseProvider.instance.createReminder(reminder: reminder);
   }
 

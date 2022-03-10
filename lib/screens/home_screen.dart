@@ -21,6 +21,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget customWidget = const Text("To Do");
   final TextEditingController searchController = TextEditingController();
 
+  showErr() {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text("Error occured!")));
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -32,21 +37,20 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       child: Scaffold(
         key: _scaffoldKey,
-        // TODO got work to do here
-        body: Center(
-          child: TextButton(
-            onPressed: () async {
-              List<Reminder> remList =
-                  await DatabaseProvider.instance.readAll();
-              developer.log(remList.length.toString());
-              developer.log(remList.map((e) => e.toString()).toString());
-            },
-            child: const Text("Get all data"),
-          ),
+        body: FutureBuilder(
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              if (snapshot.hasError) {
+                showErr();
+              }
+              return HomeBody(remList: snapshot.data as List<Reminder>);
+            }
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          },
+          future: DatabaseProvider.instance.readAll(),
         ),
-        // DataHandler().getToDos().isEmpty
-        //     ? const Center(child: Text("Nothing to show"))
-        //     : const HomeBody(),
         appBar: AppBar(
           automaticallyImplyLeading: false,
           title: customWidget,
