@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:to_do_app/models/reminder.dart';
 import 'package:to_do_app/widgets/pop_up.dart';
 import 'dart:developer' as developer;
 
@@ -16,15 +17,16 @@ class _AddToDoState extends State<AddToDo> {
   // bool validate = false;
   bool isPinned = false;
   bool notifyToggle = false;
+  Color c = Colors.white;
 
   // Button colors
   List<MyButton> buttonList = <MyButton>[
-    MyButton(index: 0, color: Colors.white),
-    MyButton(index: 1, color: Colors.amber),
-    MyButton(index: 2, color: Colors.indigo),
-    MyButton(index: 3, color: Colors.purple),
-    MyButton(index: 4, color: Colors.pink),
-    MyButton(index: 5, color: Colors.teal),
+    MyButton(index: 0, color: ReminderColor.reminderColors[0]),
+    MyButton(index: 1, color: ReminderColor.reminderColors[1]),
+    MyButton(index: 2, color: ReminderColor.reminderColors[2]),
+    MyButton(index: 3, color: ReminderColor.reminderColors[3]),
+    MyButton(index: 4, color: ReminderColor.reminderColors[4]),
+    MyButton(index: 5, color: ReminderColor.reminderColors[5]),
   ];
   // Default index
   int index = 0;

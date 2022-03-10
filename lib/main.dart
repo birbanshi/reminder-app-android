@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       initialRoute: "/",
       routes: {
-        MyAppRoutes.landingScreen: (context) => LandingScreen(),
+        MyAppRoutes.landingScreen: (context) => const LandingScreen(),
         MyAppRoutes.homeScreen: (context) => const HomeScreen(),
         MyAppRoutes.loginScreen: (context) => const LogIn(),
         MyAppRoutes.signUpScreen: (context) => const SignUp(),

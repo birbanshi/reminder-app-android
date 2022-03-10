@@ -47,7 +47,8 @@ class DatabaseProvider {
           ${ReminderFields.pinnedColumn} BOOLEAN NOT NULL,
           ${ReminderFields.notifyColumn} BOOLEAN NOT NULL,
           ${ReminderFields.dateColumn} TEXT NOT NULL,
-          ${ReminderFields.timeColumn} TEXT NOT NULL
+          ${ReminderFields.timeColumn} TEXT NOT NULL,
+          ${ReminderFields.color} INTEGER NOT NULL
         )
       ''');
     developer.log("Table $tableName has been created",
@@ -74,7 +75,8 @@ class DatabaseProvider {
 
   Future<List<Reminder>> readAll() async {
     final db = await instance.database;
-    final data = await db.query(tableName);
+    final data = await db.query(tableName,
+        groupBy: ReminderFields.timeColumn, orderBy: ReminderFields.dateColumn);
     final retVal =
         data.map((item) => Reminder.toReminder(jsonData: item)).toList();
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:developer' as developer;
 
-import 'package:to_do_app/utils/helper_methods.dart';
+import 'package:to_do_app/utils/helper.dart';
 
 const String tableName = "reminder_table";
 
@@ -13,7 +13,8 @@ class ReminderFields {
     pinnedColumn,
     notifyColumn,
     dateColumn,
-    timeColumn
+    timeColumn,
+    color
   ];
 
   static const String id = "_id";
@@ -23,6 +24,7 @@ class ReminderFields {
   static const String notifyColumn = "notify";
   static const String dateColumn = "date";
   static const String timeColumn = "time";
+  static const String color = "color";
 }
 
 class Reminder {
@@ -33,6 +35,7 @@ class Reminder {
   bool notify;
   DateTime date;
   TimeOfDay time;
+  Color color;
 
   Reminder(
       {this.id,
@@ -41,7 +44,8 @@ class Reminder {
       required this.isPinned,
       required this.notify,
       required this.date,
-      required this.time});
+      required this.time,
+      required this.color});
 
   Map<String, dynamic> toJson() {
     return {
@@ -51,7 +55,8 @@ class Reminder {
       ReminderFields.pinnedColumn: isPinned ? 1 : 0,
       ReminderFields.notifyColumn: notify ? 1 : 0,
       ReminderFields.dateColumn: date.toIso8601String(),
-      ReminderFields.timeColumn: timeOfDayToString(time: time)
+      ReminderFields.timeColumn: timeOfDayToString(time: time),
+      ReminderFields.color: ReminderColor.reminderColors.indexOf(color)
     };
   }
 
@@ -64,7 +69,9 @@ class Reminder {
         notify: jsonData[ReminderFields.notifyColumn] == 1,
         date: DateTime.parse(jsonData[ReminderFields.dateColumn] as String),
         time: stringToTimeOfDay(
-            time: jsonData[ReminderFields.timeColumn] as String));
+            time: jsonData[ReminderFields.timeColumn] as String),
+        color: ReminderColor.reminderColors
+            .elementAt(jsonData[ReminderFields.color] as int));
   }
 
   Reminder copy(
@@ -74,7 +81,8 @@ class Reminder {
           bool? isPinned,
           bool? notify,
           DateTime? date,
-          TimeOfDay? time}) =>
+          TimeOfDay? time,
+          Color? color}) =>
       Reminder(
           id: id ?? this.id,
           title: title ?? this.title,
@@ -82,10 +90,13 @@ class Reminder {
           isPinned: isPinned ?? this.isPinned,
           notify: notify ?? this.notify,
           date: date ?? this.date,
-          time: time ?? this.time);
+          time: time ?? this.time,
+          color: color ?? this.color);
 
+  @override
   String toString() {
     return '''
+    {
       ${ReminderFields.id} => $id,
       ${ReminderFields.timeColumn} => $title,
       ${ReminderFields.descriptionColumn} => $description,
@@ -93,6 +104,19 @@ class Reminder {
       ${ReminderFields.notifyColumn} => $notify,
       ${ReminderFields.dateColumn} => ${date.toIso8601String()},
       ${ReminderFields.timeColumn} => ${timeOfDayToString(time: time)}
-''';
+      ${ReminderFields.color} => ${color.value}
+    }
+  ''';
   }
+}
+
+class ReminderColor {
+  static List<Color> reminderColors = [
+    Colors.white,
+    Colors.indigo,
+    Colors.yellowAccent,
+    Colors.pinkAccent,
+    Colors.greenAccent,
+    Colors.purpleAccent,
+  ];
 }

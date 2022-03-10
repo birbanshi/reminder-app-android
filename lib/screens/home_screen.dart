@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:to_do_app/models/database/database_provider.dart';
 import 'package:to_do_app/models/reminder.dart';
 import 'package:to_do_app/services/auth.dart';
-import 'package:to_do_app/utils/helper_methods.dart';
 import 'package:to_do_app/widgets/home_body.dart';
 import 'dart:developer' as developer;
+
+import 'package:to_do_app/widgets/loading.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -40,13 +41,12 @@ class _HomeScreenState extends State<HomeScreen> {
         body: FutureBuilder(
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
-              if (snapshot.hasError) {
-                showErr();
-              }
               return HomeBody(remList: snapshot.data as List<Reminder>);
+            } else if (snapshot.hasError) {
+              showErr();
             }
             return const Center(
-              child: CircularProgressIndicator(),
+              child: Loading(),
             );
           },
           future: DatabaseProvider.instance.readAll(),

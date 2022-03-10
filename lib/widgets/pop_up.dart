@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:to_do_app/models/database/database_provider.dart';
 import 'package:to_do_app/models/reminder.dart';
-import 'package:to_do_app/utils/helper_methods.dart';
 import 'dart:developer' as developer;
 
 // Extension class that adds a new method add to TimeOfDay
@@ -45,7 +44,6 @@ class _PopUpState extends State<PopUp> {
   // If true this changes time text from "After 1 hour" to the time selected
   bool changeTimeText = false;
 
-  // TODO function to insert data in database
   void insertDataIntoDatabase(
       {required String title,
       required String? description,
@@ -58,8 +56,8 @@ class _PopUpState extends State<PopUp> {
         notify: notify,
         date: date,
         time: time,
-        description: description);
-    // developer.log(reminder.toString());
+        description: description,
+        color: color);
     DatabaseProvider.instance.createReminder(reminder: reminder);
   }
 
@@ -72,7 +70,8 @@ class _PopUpState extends State<PopUp> {
     );
     if (dialog != null) {
       setState(() {
-        // Changes the time text and sets the time to the value selected by the user
+        // Changes the time text and sets the
+        //time to the value selected by the user
         changeTimeText = true;
         time = dialog;
       });
@@ -142,6 +141,7 @@ class _PopUpState extends State<PopUp> {
                 pinned: widget.isPinned,
                 notify: widget.notificationStatus,
                 color: widget.color);
+            // developer.log(widget.color.toString());
             Navigator.pushNamedAndRemoveUntil(
                 context, "/home", (route) => false);
           },

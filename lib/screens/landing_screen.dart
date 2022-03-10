@@ -24,8 +24,7 @@ class _LandingScreenState extends State<LandingScreen> {
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return const SomeThingWentWrong();
-          }
-          if (snapshot.connectionState == ConnectionState.done) {
+          } else if (snapshot.connectionState == ConnectionState.done) {
             return const Root();
           }
           return const Loading();
