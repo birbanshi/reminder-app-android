@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:intl/intl.dart';
 import 'package:to_do_app/models/reminder.dart';
+import 'package:to_do_app/screens/add_reminder.dart';
 import 'dart:developer' as developer;
 
 import 'package:to_do_app/utils/helper.dart';
@@ -28,6 +28,12 @@ class HomeBody extends StatelessWidget {
         return InkWell(
           onTap: (() {
             developer.log("$index tapped");
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (BuildContext context) => AddReminder(
+                          rem: remList[index],
+                        )));
           }),
           child: Card(
             color: remList[index].color,

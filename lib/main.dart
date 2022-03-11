@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:to_do_app/routes/app_routes.dart';
-import 'package:to_do_app/screens/add_todo.dart';
+import 'package:to_do_app/screens/add_reminder.dart';
 import 'package:to_do_app/screens/home_screen.dart';
 import 'package:to_do_app/screens/landing_screen.dart';
 import 'package:to_do_app/screens/login.dart';
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
         MyAppRoutes.homeScreen: (context) => const HomeScreen(),
         MyAppRoutes.loginScreen: (context) => const LogIn(),
         MyAppRoutes.signUpScreen: (context) => const SignUp(),
-        MyAppRoutes.addToDo: (context) => const AddToDo(),
+        MyAppRoutes.addReminder: (context) => const AddReminder(),
       },
     );
   }

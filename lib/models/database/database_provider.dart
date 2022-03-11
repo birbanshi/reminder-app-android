@@ -69,7 +69,7 @@ class DatabaseProvider {
         conflictAlgorithm: ConflictAlgorithm.replace);
     // Log output
     developer.log("$reminder added to $_dbName",
-        name: "DatabaseProvider", level: 500);
+        name: "database_provider.dart", level: 500);
     return reminder.copy(id: id);
   }
 
@@ -87,5 +87,16 @@ class DatabaseProvider {
     return retVal;
   }
 
-  // Future readReminder() async {}
+  Future<int> updateReminder(Reminder reminder) async {
+    final db = await instance.database;
+    // developer.log(
+    //     "runtimetype => title: ${reminder.title.runtimeType}, description: ${reminder.description.runtimeType}, isPinned: ${reminder.isPinned.runtimeType}, notify: ${reminder.notify.runtimeType}, color: ${reminder.color.runtimeType}, date: ${reminder.date.runtimeType}, time: ${reminder.time.runtimeType}, id: ${reminder.id.runtimeType}");
+    final retVal = await db.update(tableName, reminder.toJson(),
+        where: "${ReminderFields.id} = ?",
+        whereArgs: [reminder.id],
+        conflictAlgorithm: ConflictAlgorithm.ignore);
+    developer.log("$reminder.id updated. $retVal changes made.",
+        level: 500, name: "database_provider.dart");
+    return retVal;
+  }
 }

@@ -3,21 +3,18 @@ import 'package:to_do_app/models/reminder.dart';
 import 'package:to_do_app/widgets/pop_up.dart';
 import 'dart:developer' as developer;
 
-class AddToDo extends StatefulWidget {
-  const AddToDo({Key? key}) : super(key: key);
+class AddReminder extends StatefulWidget {
+  final Reminder? rem;
+  const AddReminder({Key? key, this.rem}) : super(key: key);
 
   @override
-  State<AddToDo> createState() => _AddToDoState();
+  State<AddReminder> createState() => _AddReminderState();
 }
 
-class _AddToDoState extends State<AddToDo> {
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
-  bool showErrorText = false;
-  // bool validate = false;
-  bool isPinned = false;
-  bool notifyToggle = false;
-  Color c = Colors.white;
+class _AddReminderState extends State<AddReminder> {
+  late String reminderTitle;
+  late String? reminderDescription;
+  final _formKey = GlobalKey<FormState>();
 
   // Button colors
   List<MyButton> buttonList = <MyButton>[
@@ -28,9 +25,25 @@ class _AddToDoState extends State<AddToDo> {
     MyButton(index: 4, color: ReminderColor.reminderColors[4]),
     MyButton(index: 5, color: ReminderColor.reminderColors[5]),
   ];
-  // Default index
-  int index = 0;
-  Color backgroundColor = Colors.white;
+
+  late int index;
+  late Color backgroundColor;
+  late bool isPinned;
+  late bool notifyToggle;
+  late bool validInput;
+
+  @override
+  void initState() {
+    super.initState();
+    isPinned = (widget.rem != null) ? widget.rem?.isPinned as bool : false;
+    notifyToggle = (widget.rem != null) ? widget.rem?.notify as bool : false;
+    index = (widget.rem != null)
+        ? ReminderColor.reminderColors.indexOf(widget.rem?.color as Color)
+        : 0;
+    backgroundColor =
+        (widget.rem != null) ? widget.rem?.color as Color : Colors.white;
+    // developer.log("index => $index");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,8 +73,12 @@ class _AddToDoState extends State<AddToDo> {
               onPressed: () {
                 // Changes button state
                 setState(() {
+                  // developer.log("initial notifyToggle => $notifyToggle");
                   notifyToggle = !notifyToggle;
+                  // developer.log("final notifyToggle => $notifyToggle");
                 });
+                // developer.log("notifyToggle => $notifyToggle");
+                // notifyToggle = notifyToggle;
               },
               icon: notifyToggle
                   ? const Icon(Icons.notification_add_rounded)
@@ -71,43 +88,82 @@ class _AddToDoState extends State<AddToDo> {
         ),
         body: Column(
           children: [
-            TextField(
-              controller: _titleController,
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                hintText: "ToDo",
-                errorText: showErrorText ? "Field can't be empty" : null,
+            Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  TextFormField(
+                    validator: (value) {
+                      if (value == null) {
+                        return "Field can't be empty.";
+                      } else if (value.length < 11) {
+                        return "Input must be longer than 10 characters.";
+                      } else {
+                        return null;
+                      }
+                    },
+                    initialValue: widget.rem?.title,
+                    onSaved: (value) {
+                      developer.log(value as String);
+                      reminderTitle =
+                          (value != null) ? value : widget.rem?.title as String;
+                    },
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      hintText: "ToDo",
+                    ),
+                  ),
+                  TextFormField(
+                    initialValue: widget.rem?.description,
+                    onSaved: (value) {
+                      reminderDescription = value?.trim() as String;
+                    },
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      hintText: "Description",
+                    ),
+                    maxLines: null,
+                    keyboardType: TextInputType.multiline,
+                  ),
+                ],
               ),
-            ),
-            TextField(
-              controller: _descriptionController,
-              decoration: const InputDecoration(
-                border: InputBorder.none,
-                hintText: "Description",
-              ),
-              maxLines: null,
-              keyboardType: TextInputType.multiline,
             ),
           ],
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            FocusScope.of(context).unfocus();
-            setState(() {
-              _titleController.text.trim().isEmpty
-                  ? showErrorText = true
-                  : showErrorText = false;
-            });
-            if (!showErrorText) {
-              developer.log(_descriptionController.text.trim());
+            validInput = _formKey.currentState?.validate() as bool;
+            if (validInput && widget.rem == null) {
+              developer.log("validated");
+              _formKey.currentState?.save();
+              developer.log("saved...");
               showDialog(
                 context: context,
                 builder: (_) => PopUp(
-                  title: _titleController.text.trim(),
-                  description: _descriptionController.text.trim(),
+                  title: reminderTitle,
+                  description: reminderDescription,
                   isPinned: isPinned,
                   color: backgroundColor,
                   notificationStatus: notifyToggle,
+                ),
+              );
+            } else if (validInput && widget.rem != null) {
+              developer.log("validated");
+              _formKey.currentState?.save();
+              developer.log("saved");
+              showDialog(
+                context: context,
+                builder: (_) => PopUp(
+                  title: reminderTitle,
+                  description: reminderDescription,
+                  isPinned: isPinned,
+                  color: backgroundColor,
+                  notificationStatus: notifyToggle,
+                  remDate: widget.rem?.date as DateTime,
+                  remTime: widget.rem?.time as TimeOfDay,
+                  id: widget.rem?.id as int,
                 ),
               );
             }

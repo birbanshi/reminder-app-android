@@ -42,8 +42,6 @@ class _HomeScreenState extends State<HomeScreen> {
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
               return HomeBody(remList: snapshot.data as List<Reminder>);
-            } else if (snapshot.hasError) {
-              showErr();
             }
             return const Center(
               child: Loading(),
@@ -60,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 String? retVal = await Auth(auth: _auth).signOut();
                 if (retVal == "Success") {
                   // TODO fix the _castError exception
-                  Navigator.pushNamedAndRemoveUntil(
+                  await Navigator.pushNamedAndRemoveUntil(
                       context, "/login", (route) => false);
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -76,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            Navigator.pushNamed(context, "/addToDo");
+            Navigator.pushNamed(context, "/addReminder");
           },
           child: const Icon(Icons.add),
         ),
