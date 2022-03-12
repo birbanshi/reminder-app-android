@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:to_do_app/models/database/database_provider.dart';
 import 'package:to_do_app/models/reminder.dart';
 import 'package:to_do_app/widgets/pop_up.dart';
 import 'dart:developer' as developer;
@@ -58,6 +59,37 @@ class _AddReminderState extends State<AddReminder> {
         appBar: AppBar(
           title: const Text("Add ToDo"),
           actions: [
+            Visibility(
+              child: IconButton(
+                icon: const Icon(Icons.delete),
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      duration: const Duration(seconds: 10),
+                      content: const Text("Delete item?"),
+                      action: SnackBarAction(
+                          textColor: Colors.red,
+                          label: "Yes",
+                          onPressed: () {
+                            // developer.log("Yes pressed");
+                            DatabaseProvider.instance
+                                .deleteReminder(widget.rem as Reminder);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                backgroundColor: Colors.red[400],
+                                content: Text(
+                                    "Successfully deleted \"${widget.rem?.title}\""),
+                              ),
+                            );
+                            Navigator.pushNamedAndRemoveUntil(
+                                context, "/home", (route) => false);
+                          }),
+                    ),
+                  );
+                },
+              ),
+              visible: widget.rem != null,
+            ),
             IconButton(
               onPressed: () {
                 setState(() {

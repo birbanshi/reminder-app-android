@@ -99,4 +99,12 @@ class DatabaseProvider {
         level: 500, name: "database_provider.dart");
     return retVal;
   }
+
+  Future<int> deleteReminder(int id) async {
+    final db = await instance.database;
+    final retVal = db
+        .delete(tableName, where: "${ReminderFields.id} = ?", whereArgs: [id]);
+    developer.log("$retVal row deleted");
+    return retVal;
+  }
 }

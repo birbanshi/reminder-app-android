@@ -175,6 +175,12 @@ class _PopUpState extends State<PopUp> {
                     time: time,
                     color: widget.color),
               );
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("Successfully updated \"${widget.title}\""),
+                  backgroundColor: Colors.green,
+                ),
+              );
             } else {
               insertDataIntoDatabase(
                   title: widget.title,
@@ -182,6 +188,12 @@ class _PopUpState extends State<PopUp> {
                   pinned: widget.isPinned,
                   notify: widget.notificationStatus,
                   color: widget.color);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("Successfully added \"${widget.title}\""),
+                  backgroundColor: Colors.green,
+                ),
+              );
             }
             // developer.log(widget.color.toString());
             Navigator.pushNamedAndRemoveUntil(
