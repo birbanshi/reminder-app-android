@@ -57,38 +57,17 @@ class _LogInState extends State<LogIn> {
                           setState(() {
                             isVisible = true;
                           });
-                          // FutureBuilder(
-                          //   builder: (context, snapshot) {
-                          //     if (snapshot.connectionState ==
-                          //         ConnectionState.done) {
-                          //       setState(() {
-                          //         isVisible = false;
-                          //       });
-                          //       if (snapshot.data == "Success") {
-                          //         Navigator.pushNamedAndRemoveUntil(
-                          //             context, "/home", (route) => false);
-                          //       } else {
-                          //         ScaffoldMessenger.of(context)
-                          //             .showSnackBar(SnackBar(content: Text(snapshot.data.toString())));
-                          //       }
-                          //     }
-                          //   },
-                          //   future: Auth(auth: _auth).signIn(
-                          //       email: _emailController.text.trim(),
-                          //       password: _passwordController.text.trim()),
-                          // );
-
                           final String? retVal = await Auth(auth: _auth).signIn(
                               email: _emailController.text.trim(),
                               password: _passwordController.text.trim());
                           if (retVal == "Success") {
-                            Navigator.pushNamedAndRemoveUntil(
-                                context, "/home", (route) => false);
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text("Welcome back"),
                               ),
                             );
+                            await Navigator.pushNamedAndRemoveUntil(
+                                context, "/home", (route) => false);
                           } else {
                             setState(() {
                               isVisible = false;
@@ -103,8 +82,8 @@ class _LogInState extends State<LogIn> {
                         child: const Text("Log In"),
                       ),
                       TextButton(
-                        onPressed: () {
-                          Navigator.pushNamed(context, "/signUp");
+                        onPressed: () async {
+                          await Navigator.pushNamed(context, "/signUp");
                         },
                         child: const Text("Sign Up"),
                       ),

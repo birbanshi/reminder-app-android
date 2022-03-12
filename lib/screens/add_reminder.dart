@@ -66,7 +66,7 @@ class _AddReminderState extends State<AddReminder> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       duration: const Duration(seconds: 10),
-                      content: const Text("Delete item?"),
+                      content: Text("Delete \"${widget.rem?.title}\"?"),
                       action: SnackBarAction(
                           textColor: Colors.red,
                           label: "Yes",

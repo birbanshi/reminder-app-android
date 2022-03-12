@@ -107,4 +107,17 @@ class DatabaseProvider {
     developer.log("$retVal row deleted");
     return retVal;
   }
+
+  Future<List<Reminder>> getPinnedReminder() async {
+    final db = await instance.database;
+    final data = await db.query(tableName,
+        where: "${ReminderFields.notifyColumn} = ?", whereArgs: [1]);
+    final retVal = data
+        .map((reminder) => Reminder.toReminder(jsonData: reminder))
+        .toList();
+    developer.log('''Returned from getPinnedReminder =>
+                                          ${retVal.map((e) => e.toString())}
+                  ''', name: "database_provider.dart", level: 500);
+    return retVal;
+  }
 }
