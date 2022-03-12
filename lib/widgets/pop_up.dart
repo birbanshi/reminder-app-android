@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:to_do_app/utils/helper_methods.dart';
+import 'package:to_do_app/models/database/database_provider.dart';
+import 'package:to_do_app/models/reminder.dart';
+import 'dart:developer' as developer;
 
 // Extension class that adds a new method add to TimeOfDay
 extension TimeOfDayExtension on TimeOfDay {
-  TimeOfDay add({int hour = 0, int minute = 0}) {
-    return replacing(hour: this.hour + hour, minute: this.minute + minute);
+  TimeOfDay add({int hour = 0}) {
+    final retHour = TimeOfDay.now().hour + hour;
+    if (retHour > 23) {
+      return replacing(hour: 0);
+    }
+    return replacing(hour: retHour);
   }
 }
 
@@ -16,13 +21,19 @@ class PopUp extends StatefulWidget {
   final bool isPinned;
   final Color color;
   final bool notificationStatus;
+  final DateTime? remDate;
+  final TimeOfDay? remTime;
+  final int? id;
   const PopUp(
       {Key? key,
       required this.title,
       this.description,
       required this.isPinned,
       required this.color,
-      required this.notificationStatus})
+      required this.notificationStatus,
+      this.remDate,
+      this.remTime,
+      this.id})
       : super(key: key);
 
   @override
@@ -31,73 +42,41 @@ class PopUp extends StatefulWidget {
 
 class _PopUpState extends State<PopUp> {
   // Default value of time, i.e. time after an hour
-  TimeOfDay time = TimeOfDay.now().add(hour: 1);
+  late TimeOfDay time;
   // Default value of date, i.e. today
-  DateTime date = DateTime.now();
+  late DateTime date;
   // If true this changes date text from today to the date selected
-  bool changeDateText = false;
+  late bool changeDateText;
   // If true this changes time text from "After 1 hour" to the time selected
-  bool changeTimeText = false;
+  late bool changeTimeText;
 
-  // TODO modify this function to save data to sql database
-  // Gets user input
-  // void getUserInput(
-  //     {required String title,
-  //     required String? description,
-  //     required bool pinned,
-  //     required Color color}) {
-  //   handler.insert(ToDo()
-  //     ..toDoTitle = title
-  //     ..toDoDescription = description
-  //     ..notify = true
-  //     ..date =
-  //         DateFormat("yyyy-MM-dd").parse(DateFormat("yyyy-MM-dd").format(date))
-  //     ..time = time
-  //     ..pinned = pinned
-  //     ..color = color);
-  // }
+  @override
+  void initState() {
+    super.initState();
+    time = (widget.remTime != null)
+        ? widget.remTime as TimeOfDay
+        : TimeOfDay.now().add(hour: 1);
+    date =
+        (widget.remDate != null) ? widget.remDate as DateTime : DateTime.now();
+    changeDateText = (widget.remDate != null) ? true : false;
+    changeTimeText = (widget.remTime != null) ? true : false;
+  }
 
-  // TODO function to insert data in database
   void insertDataIntoDatabase(
       {required String title,
       required String? description,
       required bool pinned,
       required bool notify,
       required Color color}) async {
-    // Database db = await DatabaseProvider.instance.database;
-    // Map<String, dynamic> entry = {
-    //   DatabaseProvider.titleColumn: title,
-    //   DatabaseProvider.descriptionColumn: description,
-    //   DatabaseProvider.pinnedColumn: pinned,
-    //   DatabaseProvider.notifyColumn: notify,
-    //   DatabaseProvider.color: color.toString(),
-    //   DatabaseProvider.date: date.toString(),
-    //   DatabaseProvider.time: time.toString()
-    // };
-    // DatabaseProvider.instance.insertIntooDatabase(entry);
-    // debugPrint(DatabaseProvider.instance.insertIntooDatabase(entry).toString());
-
-    // TODO try removing the try catch block
-    // try {
-    // debugPrint(await db.insert(DatabaseProvider.instance.tableName, entry)
-    //     as String);
-    // } on DatabaseException catch (e) {
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     SnackBar(
-    //       content: Text(e.result.toString()),
-    //     ),
-    //   );
-    // } catch (e) {
-    //   // TODO fix the issue
-    //   // ScaffoldMessenger.of(context).showSnackBar(
-    //   //   SnackBar(
-    //   //     content: Text(
-    //   //       e.toString(),
-    //   //     ),
-    //   //   ),
-    //   // );
-    //   rethrow;
-    // }
+    Reminder reminder = Reminder(
+        title: title,
+        isPinned: pinned,
+        notify: notify,
+        date: date,
+        time: time,
+        description: description,
+        color: color);
+    DatabaseProvider.instance.createReminder(reminder: reminder);
   }
 
   void showCustomTimePickerDialog() async {
@@ -109,7 +88,8 @@ class _PopUpState extends State<PopUp> {
     );
     if (dialog != null) {
       setState(() {
-        // Changes the time text and sets the time to the value selected by the user
+        // Changes the time text and sets the
+        //time to the value selected by the user
         changeTimeText = true;
         time = dialog;
       });
@@ -120,13 +100,14 @@ class _PopUpState extends State<PopUp> {
     final DateTime? dialog = await showDatePicker(
       context: context,
       initialDate: date,
-      firstDate: date,
+      firstDate: DateTime.now(),
       lastDate: DateTime(2030),
       helpText: "When to remind?",
     );
     if (dialog != null) {
       setState(() {
-        // Changes the date text and sets the date to the value selected by the user
+        // Changes the date text and sets the date
+        // to the value selected by the user
         date = dialog;
         changeDateText = true;
       });
@@ -142,10 +123,18 @@ class _PopUpState extends State<PopUp> {
           Column(
             children: [
               InkWell(
+                // !changeDateText
+                //       ? const Text("Today")
+                //       : Text(DateFormat("yyyy-MM-dd").format(date))
                 child: ListTile(
-                  title: !changeDateText
+                  title: (!changeDateText)
                       ? const Text("Today")
-                      : Text(DateFormat("yyyy-MM-dd").format(date)),
+                      : (changeDateText && (date.day == DateTime.now().day))
+                          ? const Text("Today")
+                          : (changeDateText &&
+                                  (date.day == (DateTime.now().day + 1)))
+                              ? const Text("Tomorrow")
+                              : Text(DateFormat("yyyy-MM-dd").format(date)),
                   trailing: const Icon(Icons.date_range),
                 ),
                 onTap: showCustomDatePickerDialog,
@@ -172,12 +161,41 @@ class _PopUpState extends State<PopUp> {
         ),
         ElevatedButton(
           onPressed: () {
-            insertDataIntoDatabase(
-                title: widget.title,
-                description: widget.description,
-                pinned: widget.isPinned,
-                notify: widget.notificationStatus,
-                color: widget.color);
+            if (widget.id != null) {
+              developer.log("description => ${widget.description}");
+              developer.log("id => ${widget.id}");
+              DatabaseProvider.instance.updateReminder(
+                Reminder(
+                    id: widget.id,
+                    title: widget.title,
+                    description: widget.description as String,
+                    isPinned: widget.isPinned,
+                    notify: widget.notificationStatus,
+                    date: date,
+                    time: time,
+                    color: widget.color),
+              );
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("Successfully updated \"${widget.title}\""),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            } else {
+              insertDataIntoDatabase(
+                  title: widget.title,
+                  description: widget.description,
+                  pinned: widget.isPinned,
+                  notify: widget.notificationStatus,
+                  color: widget.color);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("Successfully added \"${widget.title}\""),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            }
+            // developer.log(widget.color.toString());
             Navigator.pushNamedAndRemoveUntil(
                 context, "/home", (route) => false);
           },
