@@ -100,10 +100,10 @@ class DatabaseProvider {
     return retVal;
   }
 
-  Future<int> deleteReminder(int id) async {
+  Future<int> deleteReminder(Reminder reminder) async {
     final db = await instance.database;
-    final retVal = db
-        .delete(tableName, where: "${ReminderFields.id} = ?", whereArgs: [id]);
+    final retVal = db.delete(tableName,
+        where: "${ReminderFields.id} = ?", whereArgs: [reminder.id]);
     developer.log("$retVal row deleted");
     return retVal;
   }
