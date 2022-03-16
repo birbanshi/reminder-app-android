@@ -136,9 +136,8 @@ class _AddReminderState extends State<AddReminder> {
                     },
                     initialValue: widget.rem?.title,
                     onSaved: (value) {
-                      developer.log(value as String);
-                      reminderTitle =
-                          (value != null) ? value : widget.rem?.title as String;
+                      // developer.log(value as String);
+                      reminderTitle = (value as String).trim();
                     },
                     keyboardType: TextInputType.multiline,
                     maxLines: null,
@@ -150,7 +149,7 @@ class _AddReminderState extends State<AddReminder> {
                   TextFormField(
                     initialValue: widget.rem?.description,
                     onSaved: (value) {
-                      reminderDescription = value?.trim() as String;
+                      reminderDescription = (value as String).trim();
                     },
                     decoration: const InputDecoration(
                       border: InputBorder.none,
@@ -193,8 +192,13 @@ class _AddReminderState extends State<AddReminder> {
                   isPinned: isPinned,
                   color: backgroundColor,
                   notificationStatus: notifyToggle,
-                  remDate: widget.rem?.date as DateTime,
-                  remTime: widget.rem?.time as TimeOfDay,
+                  remDate: DateTime(
+                      widget.rem!.reminderDateTime.year,
+                      widget.rem!.reminderDateTime.month,
+                      widget.rem!.reminderDateTime.day),
+                  remTime: TimeOfDay(
+                      hour: widget.rem!.reminderDateTime.hour,
+                      minute: widget.rem!.reminderDateTime.minute),
                   id: widget.rem?.id as int,
                 ),
               );

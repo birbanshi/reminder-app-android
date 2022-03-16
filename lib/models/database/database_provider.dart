@@ -46,8 +46,7 @@ class DatabaseProvider {
           ${ReminderFields.descriptionColumn} TEXT,
           ${ReminderFields.pinnedColumn} BOOLEAN NOT NULL,
           ${ReminderFields.notifyColumn} BOOLEAN NOT NULL,
-          ${ReminderFields.dateColumn} TEXT NOT NULL,
-          ${ReminderFields.timeColumn} TEXT NOT NULL,
+          ${ReminderFields.reminderDateTimeColumn} TEXT NOT NULL,
           ${ReminderFields.color} INTEGER NOT NULL
         )
       ''');
@@ -76,7 +75,7 @@ class DatabaseProvider {
   Future<List<Reminder>> readAll() async {
     final db = await instance.database;
     final data = await db.query(tableName,
-        groupBy: ReminderFields.timeColumn, orderBy: ReminderFields.dateColumn);
+        orderBy: ReminderFields.reminderDateTimeColumn);
     final retVal =
         data.map((item) => Reminder.toReminder(jsonData: item)).toList();
 

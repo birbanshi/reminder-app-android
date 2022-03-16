@@ -4,6 +4,8 @@ import 'package:to_do_app/models/database/database_provider.dart';
 import 'package:to_do_app/models/reminder.dart';
 import 'dart:developer' as developer;
 
+import 'package:to_do_app/utils/helper.dart';
+
 // Extension class that adds a new method add to TimeOfDay
 extension TimeOfDayExtension on TimeOfDay {
   TimeOfDay add({int hour = 0}) {
@@ -72,8 +74,7 @@ class _PopUpState extends State<PopUp> {
         title: title,
         isPinned: pinned,
         notify: notify,
-        date: date,
-        time: time,
+        reminderDateTime: convertToDateTime(date, time),
         description: description,
         color: color);
     DatabaseProvider.instance.createReminder(reminder: reminder);
@@ -171,8 +172,7 @@ class _PopUpState extends State<PopUp> {
                     description: widget.description as String,
                     isPinned: widget.isPinned,
                     notify: widget.notificationStatus,
-                    date: date,
-                    time: time,
+                    reminderDateTime: convertToDateTime(date, time),
                     color: widget.color),
               );
               ScaffoldMessenger.of(context).showSnackBar(

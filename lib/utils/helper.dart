@@ -120,26 +120,26 @@ Widget reminderCard(List<Reminder> rem, BuildContext context,
                   const SizedBox(
                     height: 2,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(3),
-                        decoration: BoxDecoration(
-                          border: Border.all(),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Row(
-                          children: [
-                            prettyDateFormat(rem[index].date),
-                            Text(
-                              localizations.formatTimeOfDay(rem[index].time),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.center,
+                  //   children: [
+                  //     Container(
+                  //       padding: const EdgeInsets.all(3),
+                  //       decoration: BoxDecoration(
+                  //         border: Border.all(),
+                  //         borderRadius: BorderRadius.circular(4),
+                  //       ),
+                  //       child: Row(
+                  //         children: [
+                  //           prettyDateFormat(rem[index].date),
+                  //           Text(
+                  //             localizations.formatTimeOfDay(rem[index].time),
+                  //           ),
+                  //         ],
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
                 ],
               ),
             ),
@@ -148,4 +148,8 @@ Widget reminderCard(List<Reminder> rem, BuildContext context,
       },
     ),
   );
+}
+
+DateTime convertToDateTime(DateTime date, TimeOfDay time) {
+  return DateTime(date.year, date.month, date.day, time.hour, time.minute);
 }
