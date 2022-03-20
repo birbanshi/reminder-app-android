@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:intl/intl.dart';
-import 'package:to_do_app/utils/custom_scroll_behavior.dart';
 import 'dart:developer' as developer;
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 import '../models/reminder.dart';
 import '../screens/add_reminder.dart';
@@ -74,82 +73,94 @@ List<Reminder> upcomingReminderList(List<Reminder> inputremList) {
   return upcomingList;
 }
 
-Widget reminderCard(List<Reminder> rem, BuildContext context,
-    MaterialLocalizations localizations) {
-  return ScrollConfiguration(
-    behavior: CustomScrollBehavior(),
-    child: MasonryGridView.count(
-      shrinkWrap: true,
-      reverse: false,
-      padding: const EdgeInsets.symmetric(
-        horizontal: 6,
-        vertical: 6,
+DateTime convertToDateTime(DateTime date, TimeOfDay time) {
+  return DateTime(date.year, date.month, date.day, time.hour, time.minute);
+}
+
+Widget reminderCard(List<Reminder> remList, BuildContext context) {
+  return Column(
+    // crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Visibility(
+        child: _gen(returnPinnedList(remList), "Pinned", context),
+        visible: returnPinnedList(remList).isNotEmpty,
       ),
-      itemCount: rem.length,
-      crossAxisCount: 2,
-      mainAxisSpacing: 4,
-      crossAxisSpacing: 6,
-      itemBuilder: (context, index) {
-        return InkWell(
-          onTap: (() {
-            developer.log("$index tapped");
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (BuildContext context) => AddReminder(
-                  rem: rem[index],
-                ),
-              ),
-            );
-          }),
-          child: Card(
-            color: rem[index].color,
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 12, top: 6),
-              child: Column(
-                children: [
-                  ListTile(
-                    title: Text(rem[index].title),
-                    subtitle: Visibility(
-                      visible: (rem[index].description as String).isEmpty
-                          ? false
-                          : true,
-                      child: Text(rem[index].description as String),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 2,
-                  ),
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.center,
-                  //   children: [
-                  //     Container(
-                  //       padding: const EdgeInsets.all(3),
-                  //       decoration: BoxDecoration(
-                  //         border: Border.all(),
-                  //         borderRadius: BorderRadius.circular(4),
-                  //       ),
-                  //       child: Row(
-                  //         children: [
-                  //           prettyDateFormat(rem[index].date),
-                  //           Text(
-                  //             localizations.formatTimeOfDay(rem[index].time),
-                  //           ),
-                  //         ],
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    ),
+      Visibility(
+        child: _gen(upcomingReminderList(remList), "Upcoming", context),
+        visible: upcomingReminderList(remList).isNotEmpty,
+      ),
+    ],
   );
 }
 
-DateTime convertToDateTime(DateTime date, TimeOfDay time) {
-  return DateTime(date.year, date.month, date.day, time.hour, time.minute);
+Widget _gen(List<Reminder> rem, String type, BuildContext context) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const SizedBox(
+        height: 16,
+      ),
+      Text(type),
+      MasonryGridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: rem.length,
+          crossAxisCount: 2,
+          itemBuilder: (context, index) {
+            return _itemCard(rem[index], context);
+          }),
+    ],
+  );
+}
+
+Widget _itemCard(Reminder reminder, BuildContext context) {
+  return InkWell(
+    onTap: (() {
+      developer.log("${reminder.id} tapped");
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (BuildContext context) => AddReminder(
+            rem: reminder,
+          ),
+        ),
+      );
+    }),
+    child: SizedBox(
+      width: 200,
+      child: Card(
+        color: reminder.color,
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 12, top: 6),
+          child: Column(
+            children: [
+              ListTile(
+                title: Text(reminder.title),
+                subtitle: Visibility(
+                  visible:
+                      (reminder.description as String).isEmpty ? false : true,
+                  child: Text(reminder.description as String),
+                ),
+              ),
+              const SizedBox(
+                height: 2,
+              ),
+              Center(
+                child: Container(
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    border: Border.all(),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    DateFormat("E H:m").format(reminder.reminderDateTime),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
 }

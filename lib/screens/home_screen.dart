@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:to_do_app/models/database/database_provider.dart';
 import 'package:to_do_app/models/reminder.dart';
+import 'package:to_do_app/screens/search_screen.dart';
 import 'package:to_do_app/services/auth.dart';
 import 'package:to_do_app/widgets/home_body.dart';
 import 'dart:developer' as developer;
@@ -19,9 +20,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  Icon icon = const Icon(Icons.search);
-  Widget customWidget = const Text("To Do");
-  final TextEditingController searchController = TextEditingController();
+  late List<Reminder> searchList;
 
   showErr() {
     ScaffoldMessenger.of(context)
@@ -62,6 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
           body: FutureBuilder(
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
+                searchList = snapshot.data as List<Reminder>;
                 return HomeBody(remList: snapshot.data as List<Reminder>);
               }
               return const Center(
@@ -72,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           appBar: AppBar(
             automaticallyImplyLeading: false,
-            title: customWidget,
+            title: const Text("Reminder"),
             actions: [
               IconButton(
                 onPressed: () async {
@@ -102,6 +102,8 @@ class _HomeScreenState extends State<HomeScreen> {
           floatingActionButtonLocation:
               FloatingActionButtonLocation.centerDocked,
           bottomNavigationBar: BottomAppBar(
+            shape: const CircularNotchedRectangle(),
+            notchMargin: 6,
             child: Row(
               children: [
                 IconButton(
@@ -113,47 +115,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 const Spacer(),
                 IconButton(
                   onPressed: () {
-                    setState(() {
-                      if (icon.icon == Icons.search) {
-                        icon = const Icon(Icons.cancel);
-                        customWidget = ListTile(
-                          leading: const Icon(
-                            Icons.search,
-                            color: Colors.white,
-                          ),
-                          title: TextField(
-                            controller: searchController,
-                            decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              hintText: "Search..",
-                              hintStyle: TextStyle(color: Colors.white),
-                            ),
-                            style: const TextStyle(
-                              color: Colors.white,
-                            ),
-                          ),
-                          trailing: IconButton(
-                            onPressed: () {
-                              searchController.clear();
-                            },
-                            icon: const Icon(
-                              Icons.clear_all,
-                              color: Colors.white,
-                            ),
-                          ),
-                        );
-                      } else {
-                        icon = const Icon(Icons.search);
-                        customWidget = const Text("To Do");
-                      }
-                    });
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                SearchScreen(searchList: searchList)));
                   },
-                  icon: icon,
+                  icon: const Icon(Icons.search),
                 ),
               ],
             ),
           ),
-          drawer: const Drawer(),
         ),
       ),
     );

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:developer' as developer;
 
-import 'package:to_do_app/utils/helper.dart';
-
 const String tableName = "reminder_table";
 
 class ReminderFields {
@@ -43,11 +41,14 @@ class Reminder {
       required this.reminderDateTime,
       required this.color});
 
+  // Database provider takes input as Map
   Map<String, dynamic> toJson() {
     return {
       ReminderFields.id: id,
       ReminderFields.titleColumn: title,
-      ReminderFields.descriptionColumn: description as String,
+      ReminderFields.descriptionColumn:
+          description != null ? description as String : "",
+      // Boolean is stored in sqflite as 0 or 1
       ReminderFields.pinnedColumn: isPinned ? 1 : 0,
       ReminderFields.notifyColumn: notify ? 1 : 0,
       ReminderFields.reminderDateTimeColumn: reminderDateTime.toIso8601String(),
@@ -55,11 +56,14 @@ class Reminder {
     };
   }
 
+  // Output from DatabaseProvider.instance.readAll()
+  // is returned as Map<String, Object?>
   static Reminder toReminder({required Map<String, Object?> jsonData}) {
     return Reminder(
         id: jsonData[ReminderFields.id] as int,
         title: jsonData[ReminderFields.titleColumn] as String,
         description: jsonData[ReminderFields.descriptionColumn] as String,
+        // Boolean is stored in sqflite as 0 or 1
         isPinned: jsonData[ReminderFields.pinnedColumn] == 1,
         notify: jsonData[ReminderFields.notifyColumn] == 1,
         reminderDateTime: DateTime.parse(

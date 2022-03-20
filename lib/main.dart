@@ -5,6 +5,7 @@ import 'package:to_do_app/screens/add_reminder.dart';
 import 'package:to_do_app/screens/home_screen.dart';
 import 'package:to_do_app/screens/landing_screen.dart';
 import 'package:to_do_app/screens/login.dart';
+import 'package:to_do_app/screens/search_screen.dart';
 import 'package:to_do_app/screens/sign_up.dart';
 
 void main() async {

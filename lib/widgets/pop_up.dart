@@ -101,7 +101,7 @@ class _PopUpState extends State<PopUp> {
     final DateTime? dialog = await showDatePicker(
       context: context,
       initialDate: date,
-      firstDate: DateTime.now(),
+      firstDate: date.isBefore(DateTime.now()) ? date : DateTime.now(),
       lastDate: DateTime(2030),
       helpText: "When to remind?",
     );

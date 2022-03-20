@@ -7,6 +7,7 @@ import 'package:path/path.dart';
 import 'package:to_do_app/models/reminder.dart';
 
 class DatabaseProvider {
+  final Type _type = DatabaseProvider;
   static final DatabaseProvider instance = DatabaseProvider._instance();
   static Database? _database;
   static const _dbName = "reminder_database.db";
@@ -18,14 +19,14 @@ class DatabaseProvider {
     if (_database != null) {
       // Log output
       developer.log("Database $_dbName has been created",
-          name: "database_provider.dart", level: 800);
+          name: _type.toString(), level: 800);
       return _database!;
     } else {
       _database = await _initDB();
     }
     // Log output
     developer.log("Database $_dbName has been created",
-        name: "DatabaseProvider", level: 800);
+        name: _type.toString(), level: 800);
     return _database!;
   }
 
@@ -33,8 +34,8 @@ class DatabaseProvider {
     Directory directory = await getApplicationDocumentsDirectory();
     String path = join(directory.path, _dbName);
     // Log output
-    developer.log("DB location => $path",
-        name: "database_provider.dart", level: 500);
+    developer.log("_initDB() => Database location $path",
+        name: _type.toString(), level: 500);
     return await openDatabase(path, version: _dbVersion, onCreate: _createDB);
   }
 
@@ -50,16 +51,16 @@ class DatabaseProvider {
           ${ReminderFields.color} INTEGER NOT NULL
         )
       ''');
-    developer.log("Table $tableName has been created",
-        name: "database_provider.dart", level: 800);
+    developer.log("_createDB() => Table $tableName has been created",
+        name: _type.toString(), level: 800);
   }
 
   Future closeDB() async {
     final db = await instance.database;
     db.close();
     // Log output
-    developer.log("$_dbName closed",
-        name: "database_provider.dart", level: 500);
+    developer.log("closeDB() => $_dbName has been closed",
+        name: _type.toString(), level: 500);
   }
 
   Future<Reminder> createReminder({required Reminder reminder}) async {
@@ -67,8 +68,8 @@ class DatabaseProvider {
     final id = await db.insert(tableName, reminder.toJson(),
         conflictAlgorithm: ConflictAlgorithm.replace);
     // Log output
-    developer.log("$reminder added to $_dbName",
-        name: "database_provider.dart", level: 500);
+    developer.log("createReminder() => $reminder added to $_dbName",
+        name: _type.toString(), level: 500);
     return reminder.copy(id: id);
   }
 
@@ -80,22 +81,22 @@ class DatabaseProvider {
         data.map((item) => Reminder.toReminder(jsonData: item)).toList();
 
     developer.log(
-        "Retured type => ${retVal.runtimeType.toString()} from readAll()",
+        "readAll() => ${retVal.runtimeType.toString()} with length ${retVal.length}",
         level: 500,
-        name: "database_provider.dart");
+        name: _type.toString());
     return retVal;
   }
 
   Future<int> updateReminder(Reminder reminder) async {
     final db = await instance.database;
-    // developer.log(
-    //     "runtimetype => title: ${reminder.title.runtimeType}, description: ${reminder.description.runtimeType}, isPinned: ${reminder.isPinned.runtimeType}, notify: ${reminder.notify.runtimeType}, color: ${reminder.color.runtimeType}, date: ${reminder.date.runtimeType}, time: ${reminder.time.runtimeType}, id: ${reminder.id.runtimeType}");
     final retVal = await db.update(tableName, reminder.toJson(),
         where: "${ReminderFields.id} = ?",
         whereArgs: [reminder.id],
         conflictAlgorithm: ConflictAlgorithm.ignore);
-    developer.log("$reminder.id updated. $retVal changes made.",
-        level: 500, name: "database_provider.dart");
+    developer.log(
+        "updateReminder() => ${reminder.id} updated. $retVal changes made.",
+        level: 500,
+        name: _type.toString());
     return retVal;
   }
 
@@ -103,20 +104,32 @@ class DatabaseProvider {
     final db = await instance.database;
     final retVal = db.delete(tableName,
         where: "${ReminderFields.id} = ?", whereArgs: [reminder.id]);
-    developer.log("$retVal row deleted");
+    developer.log("deleteReminder() => ${reminder.id} has been deleted",
+        level: 500, name: _type.toString());
     return retVal;
   }
 
   Future<List<Reminder>> getPinnedReminder() async {
     final db = await instance.database;
     final data = await db.query(tableName,
-        where: "${ReminderFields.notifyColumn} = ?", whereArgs: [1]);
+        where: "${ReminderFields.pinnedColumn} = ?", whereArgs: [1]);
     final retVal = data
         .map((reminder) => Reminder.toReminder(jsonData: reminder))
         .toList();
-    developer.log('''Returned from getPinnedReminder =>
-                                          ${retVal.map((e) => e.toString())}
-                  ''', name: "database_provider.dart", level: 500);
+    developer.log("getPinnedReminder() => No of pinned items ${retVal.length}",
+        level: 500, name: _type.toString());
+    return retVal;
+  }
+
+  Future<List<Reminder>> getUpcomingReminder() async {
+    final db = await instance.database;
+    final data = await db.query(tableName,
+        where: "${ReminderFields.pinnedColumn} = ?", whereArgs: [0]);
+    final retVal = data.map((e) => Reminder.toReminder(jsonData: e)).toList();
+    developer.log(
+        "getUpcomingReminder() => No of upcoming items ${retVal.length}",
+        level: 500,
+        name: _type.toString());
     return retVal;
   }
 }

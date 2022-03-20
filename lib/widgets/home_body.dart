@@ -10,54 +10,8 @@ class HomeBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = MaterialLocalizations.of(context);
     return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(
-            height: 12,
-          ),
-          Visibility(
-            child: const Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: 8,
-              ),
-              child: Text(
-                "Pinned",
-                // Move this into theme
-                style: TextStyle(
-                  fontSize: 18,
-                ),
-              ),
-            ),
-            visible: (returnPinnedList(remList).isNotEmpty),
-          ),
-          reminderCard(returnPinnedList(remList), context, localizations),
-          Visibility(
-            child: const SizedBox(
-              height: 12,
-            ),
-            visible: (returnPinnedList(remList).isNotEmpty),
-          ),
-          Visibility(
-            child: const Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: 8,
-              ),
-              child: Text(
-                "Upcoming",
-                // TODO move into theme
-                style: TextStyle(
-                  fontSize: 18,
-                ),
-              ),
-            ),
-            visible: (upcomingReminderList(remList).isNotEmpty),
-          ),
-          reminderCard(upcomingReminderList(remList), context, localizations),
-        ],
-      ),
+      child: reminderCard(remList, context),
     );
   }
 }
