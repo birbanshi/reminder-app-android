@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'dart:developer' as developer;
 
 import 'package:to_do_app/models/reminder.dart';
@@ -41,6 +42,14 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    searchController.dispose();
+    searchResult.clear();
+    widget.searchList.clear();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: GestureDetector(
@@ -80,19 +89,35 @@ class _SearchScreenState extends State<SearchScreen> {
                         decoration: const InputDecoration(
                             hintText: "Search your reminders",
                             border: InputBorder.none),
-                        onEditingComplete: () {},
+                        onEditingComplete: () {
+                          FocusScope.of(context).unfocus();
+                        },
                         onChanged: (value) {
-                          searchResult.clear();
-                          for (Reminder items in widget.searchList) {
-                            if (items.title.contains(searchController.text) ||
-                                (items.description as String)
-                                    .contains(searchController.text)) {
-                              setState(() {
-                                searchResult.add(items);
-                              });
-                              developer.log(items.toString());
+                          setState(() {
+                            searchResult.clear();
+                          });
+                          // developer.log(searchResult.length.toString());
+                          if (value.isNotEmpty) {
+                            for (Reminder items in widget.searchList) {
+                              if (items.title
+                                      .toLowerCase()
+                                      .contains(searchController.text) ||
+                                  (items.description as String)
+                                      .toLowerCase()
+                                      .contains(searchController.text)) {
+                                setState(() {
+                                  searchResult.add(items);
+                                  developer.log(searchResult.toString());
+                                });
+                                // developer.log(items.toString());
+                              }
                             }
+                          } else {
+                            setState(() {
+                              searchResult.clear();
+                            });
                           }
+                          // developer.log(searchResult.length.toString());
                         },
                         focusNode: _focus,
                       ),
@@ -136,9 +161,18 @@ class _SearchScreenState extends State<SearchScreen> {
                           selected: yesIsSelected,
                           onSelected: (value) {
                             setState(() {
+                              searchResult.clear();
                               yesIsSelected = value;
                               if (noIsSelected) {
                                 noIsSelected = !value;
+                              } else if (yesIsSelected) {
+                                for (Reminder items in widget.searchList) {
+                                  if (items.isPinned) {
+                                    searchResult.add(items);
+                                  }
+                                }
+                              } else {
+                                searchResult.clear();
                               }
                             });
                           }),
@@ -160,10 +194,20 @@ class _SearchScreenState extends State<SearchScreen> {
                         selected: noIsSelected,
                         onSelected: (value) {
                           setState(() {
+                            searchResult.clear();
                             noIsSelected = value;
                             if (yesIsSelected) {
                               yesIsSelected = !value;
+                            } else if (noIsSelected) {
+                              for (Reminder items in widget.searchList) {
+                                if (!items.isPinned) {
+                                  searchResult.add(items);
+                                }
+                              }
+                            } else {
+                              searchResult.clear();
                             }
+
                             // yesIsSelected = !value;
                           });
                         },
@@ -231,18 +275,14 @@ class _SearchScreenState extends State<SearchScreen> {
                       ),
                     ],
                   ),
-                  // Visibility(
-                  //     visible: searchResult.isNotEmpty,
-                  //     child: reminderCard(searchResult, context)),
-                  // Container(
-                  //   height: 300,
-                  //   color: Colors.red,
-                  // ),
-                  // Container(
-                  //   height: 600,
-                  //   color: Colors.blue,
-                  // ),
-                  reminderCard(widget.searchList, context),
+                  MasonryGridView.count(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: searchResult.length,
+                      crossAxisCount: 2,
+                      itemBuilder: (context, index) {
+                        return itemCard(searchResult[index], context);
+                      }),
                 ],
               ),
             ),

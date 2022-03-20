@@ -107,13 +107,13 @@ Widget _gen(List<Reminder> rem, String type, BuildContext context) {
           itemCount: rem.length,
           crossAxisCount: 2,
           itemBuilder: (context, index) {
-            return _itemCard(rem[index], context);
+            return itemCard(rem[index], context);
           }),
     ],
   );
 }
 
-Widget _itemCard(Reminder reminder, BuildContext context) {
+Widget itemCard(Reminder reminder, BuildContext context) {
   return InkWell(
     onTap: (() {
       developer.log("${reminder.id} tapped");
